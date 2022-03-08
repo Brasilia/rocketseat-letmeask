@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import { Button } from './components/Button'
 
+import './styles/global.scss'
+
 import './services/firebase'
 
 ReactDOM.render(
