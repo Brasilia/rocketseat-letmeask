@@ -10,9 +10,6 @@ import './services/firebase'
 ReactDOM.render(
   <React.StrictMode>
     <App />
-    <Button />
-    <Button text='ola mundo' />
-    <Button>{[1, 2, 3]}</Button>
   </React.StrictMode>,
   document.getElementById('root')
 );
