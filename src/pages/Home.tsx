@@ -6,17 +6,20 @@ import googleIconImg from '../assets/images/google-icon.svg'
 
 import { Button } from '../components/Button'
 
+import { useContext } from 'react'
+import { authContext } from '../App'
+
 import '../styles/auth.scss'
-import { auth, GoogleAuthProvider, signInWithPopup } from '../services/firebase'
+
 
 export function Home(){
   const navigate = useNavigate();
+  const { user, signInWithGoogle } = useContext(authContext);
 
   async function handleCreateRoom() {
-    const provider = new GoogleAuthProvider();
-    const userCredential = await signInWithPopup(auth, provider);
-    console.log(userCredential);
-    
+    if (!user) {
+      await signInWithGoogle();
+    }
     navigate('/rooms/new');
   }
 
