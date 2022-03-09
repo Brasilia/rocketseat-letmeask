@@ -1,9 +1,10 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { createContext, useState } from 'react'
+import { createContext, useState, useEffect } from 'react'
 
 import { Home } from "./pages/Home";
 import { NewRoom } from "./pages/NewRoom";
 import { auth, GoogleAuthProvider, signInWithPopup } from './services/firebase';
+import { UserInfo } from 'firebase/auth';
 
 
 type User = {
@@ -24,10 +25,8 @@ export const authContext = createContext({} as AuthContext); // maybe contexts s
 function App() {
   const [user, setUser] = useState<User>();
 
-  async function signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    const userCredential = await signInWithPopup(auth, provider);
-    const { displayName, photoURL, uid} = userCredential.user;
+  function setUserProfile(user: UserInfo) {
+    const { displayName, photoURL, uid} = user;
 
     if (!displayName || !photoURL) {
       throw new Error('Missing information from Google Account');
@@ -39,6 +38,24 @@ function App() {
       avatar: photoURL
     })
   }
+
+  async function signInWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
+    setUserProfile(user);
+  }
+
+  useEffect(
+    () => {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          setUserProfile(user);
+        }
+      })
+    },
+    []
+  )
 
   return (
     <BrowserRouter>
