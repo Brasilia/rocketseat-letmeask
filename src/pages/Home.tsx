@@ -6,15 +6,14 @@ import googleIconImg from '../assets/images/google-icon.svg'
 
 import { Button } from '../components/Button'
 
-import { useContext } from 'react'
-import { authContext } from '../App'
+import { useAuth } from '../hooks/useAuth'
 
 import '../styles/auth.scss'
 
 
 export function Home(){
   const navigate = useNavigate();
-  const { user, signInWithGoogle } = useContext(authContext);
+  const { user, signInWithGoogle } = useAuth();
 
   async function handleCreateRoom() {
     if (!user) {
