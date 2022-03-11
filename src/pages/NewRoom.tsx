@@ -32,6 +32,33 @@ export function NewRoom(){
     navigate(`/rooms/${roomRef.id}`);
   }
 
+  const form =
+    <form onSubmit={handleCreateRoom}>
+      <input 
+        type="text" 
+        placeholder='Nome da sala'
+        onChange={event => setNewRoom(event.target.value)}
+        value={newRoom}
+      />
+      <Button type="submit">
+        Criar sala
+      </Button>
+    </form>
+  ;
+  const main =
+    <main>
+      <div className='main-content'>
+        <img src={logoImg} alt="Letmeask" />
+        <h1>{user?.name}</h1>
+        <h2>Criar uma nova sala </h2>
+        {form}
+        <p>
+          Quer entrarem uma sala existente? <Link to="/">clique aqui</Link>
+        </p>
+      </div>
+    </main>
+  ;
+
   return (
     <div id="page-auth">
       <aside>
@@ -39,27 +66,7 @@ export function NewRoom(){
         <strong>Crie salas de Q&amp;A ao vivo</strong>
         <p>Tire as dúvidas da sua audiência em tempo real</p>
       </aside>
-      <main>
-        <div className='main-content'>
-          <img src={logoImg} alt="Letmeask" />
-          <h1>{user?.name}</h1>
-          <h2>Criar uma nova sala </h2>
-          <form onSubmit={handleCreateRoom}>
-            <input 
-              type="text" 
-              placeholder='Nome da sala'
-              onChange={event => setNewRoom(event.target.value)}
-              value={newRoom}
-            />
-            <Button type="submit">
-              Criar sala
-            </Button>
-          </form>
-          <p>
-            Quer entrarem uma sala existente? <Link to="/">clique aqui</Link>
-          </p>
-        </div>
-      </main>
+      {main}
     </div>
   )
 }
