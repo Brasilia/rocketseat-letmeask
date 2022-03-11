@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import illustrationImg from '../assets/images/illustration.svg'
 import logoImg from '../assets/images/logo.svg'
@@ -7,13 +7,14 @@ import logoImg from '../assets/images/logo.svg'
 import { Button } from '../components/Button'
 import { useAuth } from '../hooks/useAuth'
 
-import { addDoc, doc, setDoc } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 
 import '../styles/auth.scss'
 import { db } from '../services/firebase'
 
 export function NewRoom(){
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [newRoom, setNewRoom] = useState('');
 
   async function handleCreateRoom(event: FormEvent) {
@@ -21,13 +22,14 @@ export function NewRoom(){
     if (newRoom.trim() === '') {
       return;
     }
-    const roomRef = doc(db ,`rooms/${newRoom}`);
+    const roomsRef = collection(db ,'rooms');
     const roomData = {
       name: newRoom,
       authorId: user?.id,
       authorName: user?.name
     }
-    await setDoc(roomRef, roomData); // bad way to do it, someone can just come and overwrite the room
+    const roomRef = await addDoc( roomsRef, roomData);
+    navigate(`/rooms/${roomRef.id}`);
   }
 
   return (
