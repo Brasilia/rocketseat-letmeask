@@ -1,3 +1,4 @@
+import { FormEvent, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import illustrationImg from '../assets/images/illustration.svg'
@@ -6,14 +7,26 @@ import logoImg from '../assets/images/logo.svg'
 import { Button } from '../components/Button'
 import { useAuth } from '../hooks/useAuth'
 
+import { getFirestore, collection, getDocs, doc, Firestore, setDoc, addDoc, updateDoc } from "firebase/firestore";
 
 import '../styles/auth.scss'
+import { DocumentReference } from 'firebase/firestore'
+import { db } from '../services/firebase'
 
 export function NewRoom(){
   const { user } = useAuth();
+  const [newRoom, setNewRoom] = useState('');
 
-  async function handleCreateRoom() {
+  async function handleCreateRoom(event: FormEvent) {
+    event.preventDefault();
+    if (newRoom.trim() === '') {
+      return;
+    }
+    const roomRef = doc(db ,`rooms/${newRoom}`);
+    const test = await setDoc(roomRef,{name: 'b'}, {mergeFields:[]});
+    const test2 = await addDoc(collection(db, 'rooms'),{name:newRoom})
 
+    console.log(test);
   }
 
   return (
@@ -32,6 +45,8 @@ export function NewRoom(){
             <input 
               type="text" 
               placeholder='Nome da sala'
+              onChange={event => setNewRoom(event.target.value)}
+              value={newRoom}
             />
             <Button type="submit">
               Criar sala
