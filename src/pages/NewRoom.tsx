@@ -7,10 +7,9 @@ import logoImg from '../assets/images/logo.svg'
 import { Button } from '../components/Button'
 import { useAuth } from '../hooks/useAuth'
 
-import { getFirestore, collection, getDocs, doc, Firestore, setDoc, addDoc, updateDoc } from "firebase/firestore";
+import { addDoc, doc, setDoc } from "firebase/firestore";
 
 import '../styles/auth.scss'
-import { DocumentReference } from 'firebase/firestore'
 import { db } from '../services/firebase'
 
 export function NewRoom(){
@@ -23,10 +22,12 @@ export function NewRoom(){
       return;
     }
     const roomRef = doc(db ,`rooms/${newRoom}`);
-    const test = await setDoc(roomRef,{name: 'b'}, {mergeFields:[]});
-    const test2 = await addDoc(collection(db, 'rooms'),{name:newRoom})
-
-    console.log(test);
+    const roomData = {
+      name: newRoom,
+      authorId: user?.id,
+      authorName: user?.name
+    }
+    await setDoc(roomRef, roomData); // bad way to do it, someone can just come and overwrite the room
   }
 
   return (
