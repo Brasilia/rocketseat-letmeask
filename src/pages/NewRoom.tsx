@@ -45,6 +45,7 @@ export function NewRoom(){
       </Button>
     </form>
   ;
+  
   const main =
     <main>
       <div className='main-content'>
