@@ -1,5 +1,5 @@
-import { addDoc, collection } from 'firebase/firestore';
-import { FormEvent, useState } from 'react';
+import { addDoc, collection, doc, getDoc, onSnapshot, query } from 'firebase/firestore';
+import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import logoImg from '../assets/images/logo.svg'
 import { Button } from '../components/Button';
@@ -13,18 +13,58 @@ type RoomParams = {
   id: string;
 }
 
+type Question = {
+  id?: string,
+  content: string,
+  author: {
+    name: string,
+    avatar: string,
+  },
+  isHighlighted: boolean,
+  isAnswered: boolean,
+  asktime?: Date
+}
+
 export function Room() {
   const navigate = useNavigate();
   const params = useParams<RoomParams>();
   const [newQuestion, setNewQuestion] = useState('');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [title, setTitle] = useState('');
 
   const { user } = useAuth();
   const roomId = params.id;
 
+  useEffect(()=> {
+    async function fetchRoom() {
+      const roomSnapPromise = getDoc(doc(db, `rooms/${roomId}`));
+      const room = (await roomSnapPromise).data();
+      setTitle(room?.name); //TODO define type
+    }
+    fetchRoom();
+
+    const unsub = onSnapshot(
+      query(collection(db, `rooms/${roomId}/questions`)), 
+      querySnapshot => {
+        const questionsArray : Question[] = [];
+        querySnapshot.forEach(docSnap=>{
+          questionsArray.push(docSnap.data() as Question);
+        })
+        questionsArray.sort((a, b) => {
+          return (a.asktime! > b.asktime!) ? -1 : 0
+        });
+        setQuestions(questionsArray);
+      }
+    )
+    return unsub;
+  },
+  [roomId]
+  );
+
   async function handleSendQuestion(event: FormEvent) {
     event.preventDefault();
 
-    if (newQuestion.trim() === '') {
+    if (newQuestion.trim().length < 5) {
       return;
     }
 
@@ -32,7 +72,7 @@ export function Room() {
       throw new Error('You must be logged in');
     }
 
-    const question = {
+    const question : Question = {
       content: newQuestion,
       author: {
         name: user.name,
@@ -40,10 +80,10 @@ export function Room() {
       },
       isHighlighted: false,
       isAnswered: false,
+      asktime: new Date(Date.now()),
     };
 
-    await addDoc(collection(db, 'questions'), question);
-
+    await addDoc(collection(db, `rooms/${roomId}/questions`), question);
     setNewQuestion('');
   }
 
@@ -70,8 +110,8 @@ export function Room() {
 
       <main>
         <div className='room-title'>
-          <h1>Sala React</h1>
-          <span>4 perguntas</span>
+          <h1>Sala {title}</h1>
+          { questions.length > 0 && <span>{questions.length} pergunta{questions.length !== 1 && 's'}</span> }
         </div>
 
         <form onSubmit={handleSendQuestion}>
@@ -86,6 +126,9 @@ export function Room() {
             <Button type='submit' disabled={!user}>Enviar pergunta</Button>
           </div>
         </form>
+
+        {JSON.stringify(questions)}
+        {questions.length}
 
       </main>
     </div>
