@@ -133,7 +133,7 @@ export function Room() {
           {questions.map(question => {
             return (
               <Question
-                key={question.id}
+                key={question.id} // each element in a list should have a unique key (see "algoritmo de reconciliação")
                 content={question.content}
                 author={question.author}
               />
