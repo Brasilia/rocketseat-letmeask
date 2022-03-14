@@ -49,7 +49,8 @@ export function Room() {
       querySnapshot => {
         const questionsArray : QuestionData[] = [];
         querySnapshot.forEach(docSnap=>{
-          questionsArray.push(docSnap.data() as QuestionData);
+          const question = {...docSnap.data(), id: docSnap.id};
+          questionsArray.push(question as QuestionData);
         })
         questionsArray.sort((a, b) => {
           return (a.asktime! > b.asktime!) ? -1 : 0
