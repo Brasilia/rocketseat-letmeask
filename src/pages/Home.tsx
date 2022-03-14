@@ -11,7 +11,7 @@ import { useAuth } from '../hooks/useAuth'
 import '../styles/auth.scss'
 import { FormEvent, useState } from 'react'
 import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../services/firebase'
+import { auth, db } from '../services/firebase'
 
 
 export function Home(){
@@ -23,6 +23,7 @@ export function Home(){
     if (!user) {
       await signInWithGoogle();
     }
+    //auth.signOut();
     navigate('/rooms/new');
   }
 

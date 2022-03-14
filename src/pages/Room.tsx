@@ -3,6 +3,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import logoImg from '../assets/images/logo.svg'
 import { Button } from '../components/Button';
+import { Question } from '../components/Question';
 import { RoomCode } from '../components/RoomCode';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../services/firebase';
@@ -13,7 +14,7 @@ type RoomParams = {
   id: string;
 }
 
-type Question = {
+type QuestionData = {
   id?: string,
   content: string,
   author: {
@@ -29,7 +30,7 @@ export function Room() {
   const navigate = useNavigate();
   const params = useParams<RoomParams>();
   const [newQuestion, setNewQuestion] = useState('');
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [title, setTitle] = useState('');
 
   const { user } = useAuth();
@@ -46,9 +47,9 @@ export function Room() {
     const unsub = onSnapshot(
       query(collection(db, `rooms/${roomId}/questions`)), 
       querySnapshot => {
-        const questionsArray : Question[] = [];
+        const questionsArray : QuestionData[] = [];
         querySnapshot.forEach(docSnap=>{
-          questionsArray.push(docSnap.data() as Question);
+          questionsArray.push(docSnap.data() as QuestionData);
         })
         questionsArray.sort((a, b) => {
           return (a.asktime! > b.asktime!) ? -1 : 0
@@ -72,7 +73,7 @@ export function Room() {
       throw new Error('You must be logged in');
     }
 
-    const question : Question = {
+    const question : QuestionData = {
       content: newQuestion,
       author: {
         name: user.name,
@@ -127,9 +128,18 @@ export function Room() {
           </div>
         </form>
 
-        {JSON.stringify(questions)}
-        {questions.length}
-
+        <div className='question-list'>
+          {questions.map(question => {
+            return (
+              <Question
+                key={question.id}
+                content={question.content}
+                author={question.author}
+              />
+            );
+          })}
+        </div>
+        
       </main>
     </div>
   );
