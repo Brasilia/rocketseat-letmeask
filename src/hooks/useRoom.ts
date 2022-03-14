@@ -1,6 +1,5 @@
-import { User } from "firebase/auth";
 import { addDoc, collection, doc, getDoc, onSnapshot, query } from "firebase/firestore";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from "../services/firebase";
 import { useAuth } from "./useAuth";
 
