@@ -6,6 +6,7 @@ import { Button } from '../components/Button';
 import { Question } from '../components/Question';
 import { RoomCode } from '../components/RoomCode';
 import { useAuth } from '../hooks/useAuth';
+import { QuestionData, useRoom } from '../hooks/useRoom';
 import { db } from '../services/firebase';
 
 import '../styles/room.scss'
@@ -14,78 +15,24 @@ type RoomParams = {
   id: string;
 }
 
-type QuestionData = {
-  id?: string,
-  content: string,
-  author: {
-    name: string,
-    avatar: string,
-  },
-  isHighlighted: boolean,
-  isAnswered: boolean,
-  asktime?: Date
-}
+
 
 export function Room() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const params = useParams<RoomParams>();
   const [newQuestion, setNewQuestion] = useState('');
-  const [questions, setQuestions] = useState<QuestionData[]>([]);
-  const [title, setTitle] = useState('');
-
-  const { user } = useAuth();
+  
   const roomId = params.id;
-
-  useEffect(()=> {
-    async function fetchRoom() {
-      const roomSnapPromise = getDoc(doc(db, `rooms/${roomId}`));
-      const room = (await roomSnapPromise).data();
-      setTitle(room?.name); //TODO define type
-    }
-    fetchRoom();
-
-    const unsub = onSnapshot(
-      query(collection(db, `rooms/${roomId}/questions`)), 
-      querySnapshot => {
-        const questionsArray : QuestionData[] = [];
-        querySnapshot.forEach(docSnap=>{
-          const question = {...docSnap.data(), id: docSnap.id};
-          questionsArray.push(question as QuestionData);
-        })
-        questionsArray.sort((a, b) => {
-          return (a.asktime! > b.asktime!) ? -1 : 0
-        });
-        setQuestions(questionsArray);
-      }
-    )
-    return unsub;
-  },
-  [roomId]
-  );
+  const {questions, title, sendQuestion} = useRoom(roomId);
+  
+  
 
   async function handleSendQuestion(event: FormEvent) {
     event.preventDefault();
-
-    if (newQuestion.trim().length < 5) {
+    if(!sendQuestion(newQuestion)){
       return;
     }
-
-    if(!user) {
-      throw new Error('You must be logged in');
-    }
-
-    const question : QuestionData = {
-      content: newQuestion,
-      author: {
-        name: user.name,
-        avatar: user.avatar,
-      },
-      isHighlighted: false,
-      isAnswered: false,
-      asktime: new Date(Date.now()),
-    };
-
-    await addDoc(collection(db, `rooms/${roomId}/questions`), question);
     setNewQuestion('');
   }
 
