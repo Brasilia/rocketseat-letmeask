@@ -1,4 +1,4 @@
-import { UserInfo, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { UserInfo, GoogleAuthProvider, signInWithPopup, browserSessionPersistence, setPersistence } from "firebase/auth";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { auth } from "../services/firebase";
 
@@ -39,6 +39,7 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
 
   async function signInWithGoogle() {
     const provider = new GoogleAuthProvider();
+    await setPersistence(auth, browserSessionPersistence);
     const userCredential = await signInWithPopup(auth, provider);
     const user = userCredential.user;
     setUserProfile(user);
