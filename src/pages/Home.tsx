@@ -11,7 +11,7 @@ import { useAuth } from '../hooks/useAuth'
 import '../styles/auth.scss'
 import { FormEvent, useState } from 'react'
 import { doc, getDoc } from 'firebase/firestore'
-import { auth, db } from '../services/firebase'
+import { db } from '../services/firebase'
 
 
 export function Home(){
