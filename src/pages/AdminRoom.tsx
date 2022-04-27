@@ -52,7 +52,7 @@ export function AdminRoom() {
           {questions.map(question => {
             return (
               <Question
-                key={question.id} // each element in a list should have a unique key (see "algoritmo de reconciliação")
+                key={question.id} // each element in a list should have a unique key (see "algoritmo de reconciliação").
                 content={question.content}
                 author={question.author}
               />
